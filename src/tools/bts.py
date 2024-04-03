@@ -13,14 +13,10 @@ get_new_index_n(matrix, metric, selected_condensed, n, select_from_n, **kwargs)
 align_traj(data, N_atoms, align_method='uni')
 """
 import numpy as np
-import random
 from src.tools.esim_modules import gen_sim_dict
-from src.tools.isim_modules import gen_sim_dict
 from src.inputs.preprocess import gen_traj_numpy
 import warnings
-from shapeGMMTorch import torch_align
 import MDAnalysis as mda
-import torch
 import subprocess
 import os
 
@@ -350,7 +346,7 @@ def diversity_selection(matrix, percentage: int, metric, start='medoid', N_atoms
         seed = calculate_outlier(matrix, metric=metric, N_atoms=N_atoms)
         selected_n = [seed]
     elif start == 'random':
-        seed = random.randint(0, n_total - 1)
+        seed = np.random.default_rng().integers(0, n_total - 1)
         selected_n = [seed]
     elif isinstance(start, list):
         selected_n = start
@@ -457,6 +453,9 @@ def align_traj(data, N_atoms, align_method=None):
     """
     if not align_method:
         return data
+
+    import torch
+
     data = data.reshape(len(data), N_atoms, 3)
     device = torch.device('cpu')
     dtype = torch.float32
